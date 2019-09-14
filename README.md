@@ -8,7 +8,7 @@ The package includes a few example kenken files under ./input directory. E.g.,
 
     cargo run --release input/input.6
     
-There are are [Java](https://github.com/2015xli/KenKen) and [Java-RX](https://github.com/2015xli/KenKen-RX) versions. 
+(There are also KenKen solver in [Java](https://github.com/2015xli/KenKen) and [Java-RX](https://github.com/2015xli/KenKen-RX) versions. )
     
 You can follow the example files to create your own KenKen problems. For example, for the following KenKen problem:
 
