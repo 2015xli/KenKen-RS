@@ -17,14 +17,15 @@ pub struct Region{
 
 #[derive(Debug, Clone)]
 pub struct Problem{
-    pub regions: Vec<Region>,
+    pub regions: Vec<Rc<Region>>,
     pub dim: usize, 
-    pub matchset: Vec<Vec<Option<Region>>>,
+    pub matchset: Vec<Vec<Option<Rc<Region>>>>,
 }
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 impl Problem{
     pub fn new(file: &String) -> Self {
@@ -88,25 +89,24 @@ impl Problem{
                 || ( op != Op::NOP && points.len() == 1 ) 
                     { panic!("Incorrect region definition.") }
 
-            regions.push(Region{op, val, points:points.to_vec()});
+            regions.push(Rc::new( Region{op, val, points:points.to_vec()} ));
         }
 
         //println!("{:?}", regions);
 
-        let matchset = Problem::opt_problem(&regions, n_col);
-
-        Problem{
-            regions, 
-            dim: n_col,
-            matchset
-        }
+        let dim = n_col;
+        let mut problem = Problem { 
+                        regions, 
+                        dim, 
+                        matchset: vec![vec![None; dim]; dim]
+                    };
+        problem.opt_problem();
+        problem
     }
 
-    pub fn opt_problem(regions: &Vec<Region>, dim: usize) -> Vec<Vec<Option<Region>>>{
+    pub fn opt_problem(&mut self) {
 
-        let mut matchset: Vec<Vec<Option<Region>>> = vec![vec![None; dim]; dim];
-        
-        for region in regions {
+        for region in &self.regions {
             let mut max_p = &region.points[0];
             for p in &region.points {
                 if max_p.x < p.x  ||
@@ -114,9 +114,7 @@ impl Problem{
                     max_p = p;
                 }
             }
-            matchset[max_p.x][max_p.y] = Some(region.clone());
+            self.matchset[max_p.x][max_p.y] = Some(region.clone());
         }
-
-        matchset
     }
 }
